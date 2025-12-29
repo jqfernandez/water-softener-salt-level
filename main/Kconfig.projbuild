@@ -1,0 +1,79 @@
+menu "Water Softener Salt Level Configuration"
+
+    menu "Wi-Fi Configuration"
+        config WIFI_SSID
+            string "WiFi SSID"
+            default "myssid"
+            help
+                SSID (network name) for the ESP32 to connect to.
+
+        config WIFI_PASSWORD
+            string "WiFi Password"
+            default "mypassword"
+            help
+                WiFi password (WPA or WPA2) for the ESP32 to use.
+
+        config WIFI_MAXIMUM_RETRY
+            int "Maximum retry"
+            default 5
+            help
+                Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+    endmenu
+
+    menu "MQTT Configuration"
+        config MQTT_BROKER_URL
+            string "MQTT Broker URL"
+            default "mqtt://192.168.1.100"
+            help
+                URL of the MQTT broker to connect to (e.g., mqtt://192.168.1.100 or mqtts://broker.hivemq.com).
+
+        config MQTT_USERNAME
+            string "MQTT Username"
+            default ""
+            help
+                Username for MQTT broker authentication (leave empty if not required).
+
+        config MQTT_PASSWORD
+            string "MQTT Password"
+            default ""
+            help
+                Password for MQTT broker authentication (leave empty if not required).
+
+        config MQTT_CLIENT_ID
+            string "MQTT Client ID"
+            default "water_softener_salt_level"
+            help
+                Unique client ID for this device.
+    endmenu
+
+    menu "Sensor Configuration"
+        config TANK_HEIGHT_CM
+            int "Tank height in centimeters"
+            default 100
+            range 10 500
+            help
+                Total height of the salt tank in centimeters, used to calculate percentage full.
+
+        config SENSOR_TRIG_GPIO
+            int "HC-SR04 TRIG GPIO"
+            default 4
+            range 0 39
+            help
+                GPIO pin connected to HC-SR04 TRIG pin.
+
+        config SENSOR_ECHO_GPIO
+            int "HC-SR04 ECHO GPIO"
+            default 5
+            range 0 39
+            help
+                GPIO pin connected to HC-SR04 ECHO pin.
+
+        config READING_INTERVAL_SEC
+            int "Reading interval in seconds"
+            default 30
+            range 5 3600
+            help
+                How often to read the sensor and publish to MQTT.
+    endmenu
+
+endmenu

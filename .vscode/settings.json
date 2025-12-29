@@ -1,0 +1,24 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPath": "/Users/joaquin/esp/v5.5.2/esp-idf",
+  "idf.pythonInstallPath": "/usr/bin/python3",
+  "idf.openOcdConfigs": [
+    "interface/ftdi/esp_ftdi.cfg",
+    "target/esp32.cfg"
+  ],
+  "idf.port": "detect",
+  "idf.toolsPath": "/Users/joaquin/.espressif",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32"
+  },
+  "idf.buildPath": "${workspaceFolder}/build",
+  "clangd.path": "/Users/joaquin/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=/Users/joaquin/water-softener-salt-level/build"
+  ],
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "cmake.cmakePath": "/Users/joaquin/.espressif/tools/cmake/3.24.0/CMake.app/Contents/bin/cmake",
+  "cmake.configureOnOpen": false
+}
