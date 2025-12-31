@@ -9,7 +9,7 @@ An ESP32-based IoT device that monitors the salt level in a water softener tank 
 - **Home Assistant Auto-Discovery**: Automatically appears in Home Assistant with no manual configuration
 - **Real-time Monitoring**: Tracks both distance (cm) and salt level percentage
 - **Configurable**: Easy configuration via menuconfig for Wi-Fi, MQTT, and sensor settings
-- **Mock Sensor Mode**: Built-in test mode for development without physical sensor
+- **HC-SR04 Ultrasonic Sensor**: Accurate distance measurement for salt level monitoring
 
 ## Hardware Requirements
 
@@ -165,19 +165,6 @@ water-softener-salt-level/
 ```
 
 ## Development
-
-### Mock Sensor Mode
-
-The project includes a mock sensor function that generates test data. This is useful for:
-- Testing MQTT connectivity
-- Setting up Home Assistant dashboards
-- Verifying the system without physical hardware
-
-The mock sensor simulates salt level gradually decreasing over time.
-
-### Adding Real HC-SR04 Support
-
-When your sensor arrives, the `read_distance_cm()` function in [salt_level_monitor.c](main/salt_level_monitor.c) will be replaced with actual HC-SR04 driver code. All other functionality remains the same.
 
 ### Reflashing During Development
 

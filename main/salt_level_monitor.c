@@ -20,6 +20,8 @@
 #include "freertos/semphr.h"
 #include "freertos/queue.h"
 #include "freertos/event_groups.h"
+#include "driver/gpio.h"
+#include "esp_timer.h"
 
 static const char *TAG = "SALT_LEVEL";
 
@@ -227,18 +229,61 @@ static void publish_ha_discovery(void)
     ESP_LOGI(TAG, "Published percentage sensor discovery");
 }
 
-/* Mock sensor reading (replace with real HC-SR04 code later) */
+/* HC-SR04 Ultrasonic Sensor Reading */
 static float read_distance_cm(void)
 {
-    // Generate random distance between 10 and tank height
-    // This simulates the sensor reading from top of tank down to salt
-    static int count = 0;
-    count++;
+    // Configure GPIO pins
+    gpio_set_direction(CONFIG_SENSOR_TRIG_GPIO, GPIO_MODE_OUTPUT);
+    gpio_set_direction(CONFIG_SENSOR_ECHO_GPIO, GPIO_MODE_INPUT);
 
-    // Simulate salt level going down over time
-    float distance = 10.0f + (count % 50) * 1.5f;
+    // Send 10us trigger pulse
+    gpio_set_level(CONFIG_SENSOR_TRIG_GPIO, 0);
+    esp_rom_delay_us(2);
+    gpio_set_level(CONFIG_SENSOR_TRIG_GPIO, 1);
+    esp_rom_delay_us(10);
+    gpio_set_level(CONFIG_SENSOR_TRIG_GPIO, 0);
 
-    ESP_LOGI(TAG, "Mock sensor reading: %.1f cm", distance);
+    // Wait for echo pin to go high (with timeout)
+    int timeout = 0;
+    while (gpio_get_level(CONFIG_SENSOR_ECHO_GPIO) == 0 && timeout < 10000) {
+        esp_rom_delay_us(1);
+        timeout++;
+    }
+
+    if (timeout >= 10000) {
+        ESP_LOGW(TAG, "HC-SR04 timeout waiting for echo start");
+        return -1.0f;
+    }
+
+    // Measure pulse width
+    int64_t start_time = esp_timer_get_time();
+    timeout = 0;
+
+    while (gpio_get_level(CONFIG_SENSOR_ECHO_GPIO) == 1 && timeout < 30000) {
+        esp_rom_delay_us(1);
+        timeout++;
+    }
+
+    if (timeout >= 30000) {
+        ESP_LOGW(TAG, "HC-SR04 timeout waiting for echo end");
+        return -1.0f;
+    }
+
+    int64_t end_time = esp_timer_get_time();
+    int64_t pulse_duration = end_time - start_time;
+
+    // Calculate distance: speed of sound is 343 m/s or 0.0343 cm/us
+    // Distance = (pulse_duration * 0.0343) / 2
+    float distance = (pulse_duration * 0.0343f) / 2.0f;
+
+    ESP_LOGI(TAG, "HC-SR04 reading: %.1f cm (pulse: %lld us)", distance, pulse_duration);
+
+    // Sanity check: HC-SR04 range is 2cm to 400cm
+    if (distance < 2.0f || distance > 400.0f) {
+        ESP_LOGW(TAG, "Distance out of range: %.1f cm", distance);
+        return -1.0f;
+    }
+
     return distance;
 }
 
